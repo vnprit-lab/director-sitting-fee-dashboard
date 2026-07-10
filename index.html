@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Director Sitting Fee Dashboard — Pace Digitek Group</title>
+<style>
+  :root{
+    --ink:#071A2E; --panel:#0D2540; --panel2:#0A2038; --line:#1C3A5C;
+    --paper:#EAF1F8; --muted:#7E97B0; --faint:#54708C;
+    --blue:#3D7BFF; --gold:#D9A441; --green:#3DC98B; --red:#D96A5B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{-webkit-text-size-adjust:100%;}
+  body{background:var(--ink); color:var(--paper); font-family:Arial,Helvetica,sans-serif; font-size:14px; line-height:1.5;}
+  .serif{font-family:Georgia,'Times New Roman',serif;}
+  .wrap{max-width:1180px; margin:0 auto; padding:28px 20px 80px;}
+
+  /* header */
+  .eyebrow{font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;}
+  h1{font-family:Georgia,serif; font-weight:400; font-size:30px; letter-spacing:.01em;}
+  .topbar{display:flex; flex-wrap:wrap; gap:18px; align-items:flex-end; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:20px;}
+  .controls{display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+  .seg{display:flex; border:1px solid var(--line); border-radius:3px; overflow:hidden;}
+  .seg button{background:transparent; border:0; color:var(--muted); padding:8px 14px; font-size:12px; cursor:pointer; font-family:inherit; border-right:1px solid var(--line); white-space:nowrap;}
+  .seg button:last-child{border-right:0;}
+  .seg button.on{background:var(--panel); color:var(--paper); box-shadow:inset 0 -2px 0 var(--gold);}
+  select{background:var(--panel); color:var(--paper); border:1px solid var(--line); border-radius:3px; padding:8px 10px; font-size:12px; font-family:inherit;}
+  .ghost{background:transparent; border:1px solid var(--line); color:var(--muted); border-radius:3px; padding:8px 12px; font-size:12px; cursor:pointer; font-family:inherit;}
+  .ghost:hover{color:var(--paper); border-color:var(--faint);}
+  button:focus-visible, select:focus-visible, .card:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .badge{font-size:11px; color:var(--ink); background:var(--gold); border-radius:3px; padding:3px 8px; letter-spacing:.05em;}
+  .stamp{font-size:11px; color:var(--faint);}
+
+  /* KPI strip */
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); border:1px solid var(--line); border-radius:4px; margin:24px 0; background:var(--panel2);}
+  .kpi{padding:18px 20px; border-right:1px solid var(--line);}
+  .kpi:last-child{border-right:0;}
+  .kpi .lbl{font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:6px;}
+  .kpi .val{font-family:Georgia,serif; font-size:26px;}
+  .kpi .sub{font-size:11px; color:var(--faint); margin-top:2px;}
+  .val.green{color:var(--green);} .val.red{color:var(--red);}
+
+  .secttl{font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin:26px 0 12px;}
+
+  /* director cards */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(255px,1fr)); gap:14px;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:16px 16px 14px; cursor:pointer; text-align:left; color:var(--paper); font-family:inherit; transition:border-color .15s, transform .15s;}
+  .card:hover{border-color:var(--gold); transform:translateY(-2px);}
+  .card .nm{font-family:Georgia,serif; font-size:17px; margin-bottom:6px;}
+  .chips{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:12px;}
+  .chip{font-size:10px; letter-spacing:.06em; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:2px 7px;}
+  .card .row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
+  .card .num{font-family:Georgia,serif; font-size:18px;}
+  .card .cap{font-size:10px; color:var(--faint); text-transform:uppercase; letter-spacing:.12em;}
+  .strip{display:flex; flex-wrap:wrap; gap:3px;}
+  .tick{width:10px; height:10px; border-radius:2px;}
+  .tick.vc{background:var(--blue);} .tick.ph{background:var(--gold);}
+
+  /* detail */
+  .back{background:transparent; border:0; color:var(--gold); font-size:12px; letter-spacing:.1em; cursor:pointer; padding:0; margin-bottom:14px; font-family:inherit; text-transform:uppercase;}
+  .dhead{display:flex; flex-wrap:wrap; gap:14px; align-items:baseline; margin-bottom:4px;}
+  .dhead h2{font-family:Georgia,serif; font-weight:400; font-size:26px;}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
+  @media(max-width:760px){.two{grid-template-columns:1fr;}}
+  .panel{background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:18px;}
+  .panel h3{font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); font-weight:normal; margin-bottom:14px;}
+
+  .bar{margin-bottom:11px;}
+  .bar .t{display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;}
+  .bar .t span:last-child{color:var(--muted); font-variant-numeric:tabular-nums;}
+  .bar .tr{height:7px; background:var(--ink); border-radius:2px; overflow:hidden;}
+  .bar .fl{height:100%; background:var(--gold); border-radius:2px;}
+
+  .donutwrap{display:flex; gap:20px; align-items:center; justify-content:center; flex-wrap:wrap;}
+  .legend div{font-size:12px; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:8px;}
+  .dot{width:10px; height:10px; border-radius:2px; display:inline-block;}
+  .legend b{color:var(--paper); font-family:Georgia,serif; font-size:15px; font-weight:normal;}
+
+  table{width:100%; border-collapse:collapse; font-size:12.5px;}
+  th{font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); text-align:left; font-weight:normal; padding:8px 10px; border-bottom:1px solid var(--line);}
+  td{padding:9px 10px; border-bottom:1px solid #12304F; font-variant-numeric:tabular-nums;}
+  td.r, th.r{text-align:right;}
+  tr:hover td{background:#10294555;}
+  .pill{font-size:10px; padding:2px 8px; border-radius:10px; letter-spacing:.05em;}
+  .pill.paid{color:var(--green); border:1px solid var(--green);}
+  .pill.pend{color:var(--red); border:1px solid var(--red);}
+  .mode{display:inline-flex; align-items:center; gap:6px;}
+  .empty{border:1px dashed var(--line); border-radius:4px; padding:40px; text-align:center; color:var(--muted); font-size:13px;}
+  .foot{margin-top:40px; border-top:1px solid var(--line); padding-top:14px; font-size:11px; color:var(--faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;}
+  .tblwrap{overflow-x:auto;}
+  @media(prefers-reduced-motion:reduce){.card{transition:none;}}
+  @media(max-width:640px){ h1{font-size:24px;} .kpi .val{font-size:21px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <div class="eyebrow">Pace Digitek Group &middot; Board Governance</div>
+      <h1>Director Sitting Fee Dashboard</h1>
+    </div>
+    <div class="controls">
+      <div class="seg" id="coSeg" role="tablist" aria-label="Company filter"></div>
+      <select id="fySel" aria-label="Financial year filter"></select>
+      <button class="ghost" id="refreshBtn">Refresh data</button>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:10px; align-items:center; margin-top:12px;">
+    <span class="badge" id="srcBadge" hidden>Sample data — Google Sheet not connected yet</span>
+    <span class="stamp" id="stamp"></span>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div id="gridView">
+    <div class="secttl" id="gridTtl">Directors</div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div id="detailView" hidden></div>
+
+  <div class="foot">
+    <span>Data source: Company Secretary &middot; Meeting Log (Google Sheets)</span>
+    <span>All fee figures gross of TDS, in INR.</span>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   SETUP — ONE LINE TO EDIT
+   In Google Sheets: File > Share > Publish to web > "Meeting Log" tab >
+   CSV > Publish. Paste that link between the quotes below.
+   Leave blank ("") to preview with sample data.
+===================================================================== */
+const SHEET_CSV_URL = "";
+
+/* Sample data (mirrors the input template) — ignored once a URL is set */
+const SAMPLE_CSV = `Date,Company,Meeting Type,Director Name,Attendance Mode,Sitting Fee (INR Gross),Payment Status,Payment Date,Remarks
+15-Apr-2026,Pace Digitek Limited,Board Meeting,Mr. Sample Director 1,Physical,100000,Paid,30-Apr-2026,Q4 FY26 results board
+15-Apr-2026,Pace Digitek Limited,Board Meeting,Ms. Sample Director 2,Video Conferencing,100000,Paid,30-Apr-2026,
+15-Apr-2026,Pace Digitek Limited,Audit Committee,Mr. Sample Director 1,Physical,50000,Paid,30-Apr-2026,
+15-Apr-2026,Pace Digitek Limited,Audit Committee,Ms. Sample Director 2,Video Conferencing,50000,Pending,,
+22-May-2026,Lineage Power Private Limited,Board Meeting,Mr. Sample Director 3,Video Conferencing,75000,Paid,05-Jun-2026,
+22-May-2026,Lineage Power Private Limited,Board Meeting,Mr. Sample Director 1,Physical,75000,Pending,,
+10-Jun-2026,Pace Digitek Limited,Nomination & Remuneration Committee,Ms. Sample Director 4,Physical,40000,Pending,,ESOP grant review`;
+
+const COMPANIES = ["Pace Digitek Limited","Lineage Power Private Limited"];
+const SHORT = {"Pace Digitek Limited":"PDL","Lineage Power Private Limited":"LPPL"};
+
+let rows = [], state = {co:"All", fy:"All", director:null};
+
+/* ---------- CSV parsing (handles quoted fields) ---------- */
+function parseCSV(text){
+  const out=[]; let row=[], cur="", inQ=false;
+  for(let i=0;i<text.length;i++){
+    const ch=text[i];
+    if(inQ){
+      if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else inQ=false; }
+      else cur+=ch;
+    } else {
+      if(ch==='"') inQ=true;
+      else if(ch===','){row.push(cur);cur="";}
+      else if(ch==='\n'){row.push(cur);out.push(row);row=[];cur="";}
+      else if(ch!=='\r') cur+=ch;
+    }
+  }
+  if(cur.length||row.length){row.push(cur);out.push(row);}
+  return out;
+}
+
+const MONTHS={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function parseDate(s){
+  s=(s||"").trim(); if(!s) return null;
+  let m=s.match(/^(\d{1,2})[-\s]([A-Za-z]{3,})[-\s,]*(\d{4})$/);           // 15-Apr-2026
+  if(m){const mo=MONTHS[m[2].slice(0,3).toLowerCase()]; if(mo!==undefined) return new Date(+m[3],mo,+m[1]);}
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);                                   // ISO
+  if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/^(\d{1,2})[\/.](\d{1,2})[\/.](\d{2,4})$/);                    // dd/mm/yyyy (day-first)
+  if(m){let y=+m[3]; if(y<100)y+=2000; return new Date(y,+m[2]-1,+m[1]);}
+  const d=new Date(s); return isNaN(d)?null:d;
+}
+function fyOf(d){ if(!d) return "—"; const y=d.getMonth()>=3?d.getFullYear()+1:d.getFullYear(); return "FY"+String(y).slice(2); }
+const inr = n => "₹"+Math.round(n).toLocaleString("en-IN");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmtD = d => d? d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"}) : "";
+
+function toRows(csvText){
+  const raw=parseCSV(csvText).filter(r=>r.some(c=>c&&c.trim()!==""));
+  if(!raw.length) return [];
+  let start=0;
+  if(/date/i.test(raw[0][0]||"")) start=1;
+  const out=[];
+  for(let i=start;i<raw.length;i++){
+    const r=raw[i];
+    const date=parseDate(r[0]);
+    const director=(r[3]||"").trim();
+    if(!director) continue;
+    const modeRaw=(r[4]||"").toLowerCase();
+    out.push({
+      date, fy:fyOf(date),
+      company:(r[1]||"").trim(),
+      meeting:(r[2]||"").trim()||"Board Meeting",
+      director,
+      mode: modeRaw.includes("phys") ? "Physical" : "Video Conferencing",
+      fee: parseFloat(String(r[5]||"0").replace(/[₹,\s]/g,""))||0,
+      status: /paid/i.test(r[6]||"") ? "Paid" : "Pending",
+      payDate: parseDate(r[7]),
+      remarks:(r[8]||"").trim()
+    });
+  }
+  out.sort((a,b)=>(a.date?.getTime()||0)-(b.date?.getTime()||0));
+  return out;
+}
+
+/* ---------- load ---------- */
+async function load(){
+  const stamp=document.getElementById("stamp");
+  if(!SHEET_CSV_URL){
+    rows=toRows(SAMPLE_CSV);
+    document.getElementById("srcBadge").hidden=false;
+    stamp.textContent="";
+    render(); return;
+  }
+  stamp.textContent="Loading…";
+  try{
+    const res=await fetch(SHEET_CSV_URL+(SHEET_CSV_URL.includes("?")?"&":"?")+"cb="+Date.now(),{cache:"no-store"});
+    if(!res.ok) throw new Error(res.status);
+    rows=toRows(await res.text());
+    stamp.textContent="Updated "+new Date().toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+  }catch(e){
+    stamp.textContent="Could not reach the Google Sheet. Check the published link, then hit Refresh data.";
+  }
+  render();
+}
+
+/* ---------- filtering ---------- */
+function filtered(){
+  return rows.filter(r=>
+    (state.co==="All"||r.company===state.co) &&
+    (state.fy==="All"||r.fy===state.fy)
+  );
+}
+
+/* ---------- render ---------- */
+function render(){
+  // company segmented control
+  const seg=document.getElementById("coSeg");
+  seg.innerHTML="";
+  ["All",...COMPANIES].forEach(c=>{
+    const b=document.createElement("button");
+    b.textContent=c==="All"?"All entities":(SHORT[c]||c);
+    b.className=state.co===c?"on":"";
+    b.onclick=()=>{state.co=c;render();};
+    seg.appendChild(b);
+  });
+  // FY select
+  const fys=[...new Set(rows.map(r=>r.fy))].filter(f=>f!=="—").sort();
+  const sel=document.getElementById("fySel");
+  sel.innerHTML=['<option value="All">All periods</option>',...fys.map(f=>`<option ${state.fy===f?"selected":""}>${f}</option>`)].join("");
+  sel.onchange=e=>{state.fy=e.target.value;render();};
+
+  const data=filtered();
+
+  // KPIs
+  const gross=data.reduce((s,r)=>s+r.fee,0);
+  const paid=data.filter(r=>r.status==="Paid").reduce((s,r)=>s+r.fee,0);
+  const dirs=new Set(data.map(r=>r.director)).size;
+  document.getElementById("kpis").innerHTML=`
+    <div class="kpi"><div class="lbl">Meetings attended</div><div class="val">${data.length}</div><div class="sub">director-meeting instances</div></div>
+    <div class="kpi"><div class="lbl">Directors</div><div class="val">${dirs}</div><div class="sub">with logged attendance</div></div>
+    <div class="kpi"><div class="lbl">Gross sitting fees</div><div class="val">${inr(gross)}</div><div class="sub">before TDS</div></div>
+    <div class="kpi"><div class="lbl">Paid</div><div class="val green">${inr(paid)}</div><div class="sub">disbursed</div></div>
+    <div class="kpi"><div class="lbl">Pending</div><div class="val red">${inr(gross-paid)}</div><div class="sub">approved, not yet paid</div></div>`;
+
+  if(state.director && !data.some(r=>r.director===state.director)) state.director=null;
+  state.director ? renderDetail(data) : renderGrid(data);
+}
+
+function renderGrid(data){
+  document.getElementById("detailView").hidden=true;
+  const gv=document.getElementById("gridView"); gv.hidden=false;
+  const grid=document.getElementById("grid");
+  const byDir={};
+  data.forEach(r=>{(byDir[r.director]=byDir[r.director]||[]).push(r);});
+  const names=Object.keys(byDir).sort();
+  document.getElementById("gridTtl").textContent=`Directors — click a name to drill down`;
+  if(!names.length){grid.innerHTML=`<div class="empty" style="grid-column:1/-1">No meetings logged for this filter yet. The dashboard fills in as the CS updates the Meeting Log.</div>`;return;}
+  grid.innerHTML=names.map(n=>{
+    const rs=byDir[n];
+    const cos=[...new Set(rs.map(r=>SHORT[r.company]||r.company))];
+    const fee=rs.reduce((s,r)=>s+r.fee,0);
+    const strip=rs.map(r=>`<span class="tick ${r.mode==="Physical"?"ph":"vc"}" title="${esc(fmtD(r.date))} · ${esc(r.meeting)} · ${esc(r.mode)}"></span>`).join("");
+    return `<button class="card" onclick="openDir('${esc(n).replace(/'/g,"\\'")}')">
+      <div class="nm">${esc(n)}</div>
+      <div class="chips">${cos.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>
+      <div class="row"><div><div class="num">${rs.length}</div><div class="cap">Meetings</div></div>
+      <div style="text-align:right"><div class="num">${inr(fee)}</div><div class="cap">Gross fees</div></div></div>
+      <div class="strip">${strip}</div>
+    </button>`;
+  }).join("");
+}
+
+function openDir(n){ state.director=n; render(); window.scrollTo({top:0,behavior:"smooth"}); }
+function closeDir(){ state.director=null; render(); }
+
+function donutSVG(vc,ph){
+  const total=vc+ph||1, R=52, C=2*Math.PI*R;
+  const vcLen=C*vc/total;
+  return `<svg width="150" height="150" viewBox="0 0 150 150" role="img" aria-label="Attendance mode split">
+    <circle cx="75" cy="75" r="${R}" fill="none" stroke="#0F2B49" stroke-width="20"/>
+    <circle cx="75" cy="75" r="${R}" fill="none" stroke="var(--gold)" stroke-width="20"
+      stroke-dasharray="${C-vcLen} ${vcLen}" stroke-dashoffset="${-vcLen}" transform="rotate(-90 75 75)"/>
+    <circle cx="75" cy="75" r="${R}" fill="none" stroke="var(--blue)" stroke-width="20"
+      stroke-dasharray="${vcLen} ${C-vcLen}" transform="rotate(-90 75 75)"/>
+    <text x="75" y="71" text-anchor="middle" fill="var(--paper)" font-family="Georgia,serif" font-size="24">${vc+ph}</text>
+    <text x="75" y="90" text-anchor="middle" fill="var(--muted)" font-size="9" letter-spacing="2">MEETINGS</text>
+  </svg>`;
+}
+
+function renderDetail(data){
+  document.getElementById("gridView").hidden=true;
+  const dv=document.getElementById("detailView"); dv.hidden=false;
+  const rs=data.filter(r=>r.director===state.director);
+  const gross=rs.reduce((s,r)=>s+r.fee,0);
+  const paid=rs.filter(r=>r.status==="Paid").reduce((s,r)=>s+r.fee,0);
+  const vc=rs.filter(r=>r.mode!=="Physical").length, ph=rs.length-vc;
+  const cos=[...new Set(rs.map(r=>r.company))];
+
+  const byType={};
+  rs.forEach(r=>{byType[r.meeting]=(byType[r.meeting]||0)+1;});
+  const maxT=Math.max(...Object.values(byType),1);
+  const bars=Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([t,c])=>`
+    <div class="bar"><div class="t"><span>${esc(t)}</span><span>${c}</span></div>
+    <div class="tr"><div class="fl" style="width:${c/maxT*100}%"></div></div></div>`).join("");
+
+  const trs=rs.slice().reverse().map(r=>`<tr>
+      <td>${esc(fmtD(r.date))}</td>
+      <td>${esc(SHORT[r.company]||r.company)}</td>
+      <td>${esc(r.meeting)}</td>
+      <td><span class="mode"><span class="dot" style="background:${r.mode==="Physical"?"var(--gold)":"var(--blue)"}"></span>${r.mode==="Physical"?"Physical":"VC"}</span></td>
+      <td class="r">${inr(r.fee)}</td>
+      <td><span class="pill ${r.status==="Paid"?"paid":"pend"}">${r.status}</span></td>
+      <td>${esc(fmtD(r.payDate))}</td>
+    </tr>`).join("");
+
+  dv.innerHTML=`
+    <button class="back" onclick="closeDir()">&larr; All directors</button>
+    <div class="dhead"><h2 class="serif">${esc(state.director)}</h2>
+      <div class="chips">${cos.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div></div>
+    <div class="kpis">
+      <div class="kpi"><div class="lbl">Meetings attended</div><div class="val">${rs.length}</div></div>
+      <div class="kpi"><div class="lbl">Gross fees</div><div class="val">${inr(gross)}</div></div>
+      <div class="kpi"><div class="lbl">Paid</div><div class="val green">${inr(paid)}</div></div>
+      <div class="kpi"><div class="lbl">Pending</div><div class="val red">${inr(gross-paid)}</div></div>
+    </div>
+    <div class="two">
+      <div class="panel"><h3>Attendance by meeting type</h3>${bars}</div>
+      <div class="panel"><h3>Mode of attendance</h3>
+        <div class="donutwrap">${donutSVG(vc,ph)}
+          <div class="legend">
+            <div><span class="dot" style="background:var(--blue)"></span> Video conferencing &nbsp;<b>${vc}</b></div>
+            <div><span class="dot" style="background:var(--gold)"></span> Physical &nbsp;<b>${ph}</b></div>
+          </div></div></div>
+    </div>
+    <div class="panel" style="margin-top:14px"><h3>Meeting-wise record</h3>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Date</th><th>Entity</th><th>Meeting</th><th>Mode</th><th class="r">Gross fee</th><th>Status</th><th>Paid on</th></tr></thead>
+        <tbody>${trs}</tbody>
+      </table></div></div>`;
+}
+
+document.getElementById("refreshBtn").onclick=load;
+load();
+</script>
+</body>
+</html>
