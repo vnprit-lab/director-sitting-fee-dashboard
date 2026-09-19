@@ -53,9 +53,9 @@
   .card .row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
   .card .num{font-family:Georgia,serif; font-size:18px;}
   .card .cap{font-size:10px; color:var(--faint); text-transform:uppercase; letter-spacing:.12em;}
-  .strip{display:flex; flex-wrap:wrap; gap:3px;}
-  .tick{width:10px; height:10px; border-radius:2px;}
-  .tick.vc{background:var(--blue);} .tick.ph{background:var(--gold);}
+  .strip{display:flex; flex-wrap:wrap; gap:4px;}
+  .tick{width:16px; height:16px; border-radius:3px; display:inline-flex; align-items:center; justify-content:center; background:var(--ink);}
+  .tick svg{display:block;}
 
   /* detail */
   .back{background:transparent; border:0; color:var(--gold); font-size:12px; letter-spacing:.1em; cursor:pointer; padding:0; margin-bottom:14px; font-family:inherit; text-transform:uppercase;}
@@ -74,7 +74,6 @@
 
   .donutwrap{display:flex; gap:20px; align-items:center; justify-content:center; flex-wrap:wrap;}
   .legend div{font-size:12px; color:var(--muted); margin-bottom:8px; display:flex; align-items:center; gap:8px;}
-  .dot{width:10px; height:10px; border-radius:2px; display:inline-block;}
   .legend b{color:var(--paper); font-family:Georgia,serif; font-size:15px; font-weight:normal;}
 
   table{width:100%; border-collapse:collapse; font-size:12.5px;}
@@ -292,7 +291,7 @@ function renderGrid(data){
     const rs=byDir[n];
     const cos=[...new Set(rs.map(r=>SHORT[r.company]||r.company))];
     const fee=rs.reduce((s,r)=>s+r.fee,0);
-    const strip=rs.map(r=>`<span class="tick ${r.mode==="Physical"?"ph":"vc"}" title="${esc(fmtD(r.date))} · ${esc(r.meeting)} · ${esc(r.mode)}"></span>`).join("");
+    const strip=rs.map(r=>`<span class="tick" title="${esc(fmtD(r.date))} · ${esc(r.meeting)} · ${esc(r.mode)}">${iconMode(r.mode,12)}</span>`).join("");
     return `<button class="card" onclick="openDir('${esc(n).replace(/'/g,"\\'")}')">
       <div class="nm">${esc(n)}</div>
       <div class="chips">${cos.map(c=>`<span class="chip">${esc(c)}</span>`).join("")}</div>
@@ -305,6 +304,15 @@ function renderGrid(data){
 
 function openDir(n){ state.director=n; render(); window.scrollTo({top:0,behavior:"smooth"}); }
 function closeDir(){ state.director=null; render(); }
+
+/* Video-camera icon for remote attendance, person icon for in-room attendance */
+function iconMode(mode, size){
+  size=size||16;
+  if(mode==="Physical"){
+    return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Physical attendance"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c1-3.8 4-5.6 6.5-5.6s5.5 1.8 6.5 5.6"/></svg>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role="img" aria-label="Video conferencing attendance"><rect x="2.5" y="7" width="12" height="10" rx="2"/><path d="M14.5 10.5 21 7v10l-6.5-3.5"/></svg>`;
+}
 
 function donutSVG(vc,ph){
   const total=vc+ph||1, R=52, C=2*Math.PI*R;
@@ -340,7 +348,7 @@ function renderDetail(data){
       <td>${esc(fmtD(r.date))}</td>
       <td>${esc(SHORT[r.company]||r.company)}</td>
       <td>${esc(r.meeting)}</td>
-      <td><span class="mode"><span class="dot" style="background:${r.mode==="Physical"?"var(--gold)":"var(--blue)"}"></span>${r.mode==="Physical"?"Physical":"VC"}</span></td>
+      <td><span class="mode">${iconMode(r.mode,15)}${r.mode==="Physical"?"Physical":"VC"}</span></td>
       <td class="r">${inr(r.fee)}</td>
       <td><span class="pill ${r.status==="Paid"?"paid":"pend"}">${r.status}</span></td>
       <td>${esc(fmtD(r.payDate))}</td>
@@ -361,8 +369,8 @@ function renderDetail(data){
       <div class="panel"><h3>Mode of attendance</h3>
         <div class="donutwrap">${donutSVG(vc,ph)}
           <div class="legend">
-            <div><span class="dot" style="background:var(--blue)"></span> Video conferencing &nbsp;<b>${vc}</b></div>
-            <div><span class="dot" style="background:var(--gold)"></span> Physical &nbsp;<b>${ph}</b></div>
+            <div>${iconMode("Video Conferencing",16)} Video conferencing &nbsp;<b>${vc}</b></div>
+            <div>${iconMode("Physical",16)} Physical &nbsp;<b>${ph}</b></div>
           </div></div></div>
     </div>
     <div class="panel" style="margin-top:14px"><h3>Meeting-wise record</h3>
